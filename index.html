@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>TriBridge Studios & Services Chatbot</title>
+<style>
+body { font-family: Arial, sans-serif; background:#f4f4f4; margin:0; padding:0; display:flex; justify-content:center; align-items:center; height:100vh; transition:0.3s;}
+body.dark { background:#111; color:white;}
+.chat-container { background:#fff; width:400px; max-width:90%; border-radius:10px; box-shadow:0 0 15px rgba(0,0,0,0.25); display:flex; flex-direction:column; padding:20px; transition:0.3s; height:80vh;}
+body.dark .chat-container { background:#222; color:white;}
+h2 { text-align:center; margin-bottom:10px;}
+.toggle-btn { cursor:pointer; background:#111; color:white; border-radius:5px; padding:8px; font-size:14px; margin-bottom:10px; text-align:center;}
+#chat { flex:1; overflow-y:auto; padding-bottom:10px;}
+.message { margin:10px 0; padding:10px; border-radius:10px; max-width:80%; display:inline-block; clear:both;}
+.user { background:#1e293b; color:white; float:right;}
+.bot { background:#eee; color:#111; float:left;}
+body.dark .bot { background:#333; color:white;}
+button.service { padding:10px 20px; margin:5px 0; border:none; border-radius:5px; cursor:pointer; width:100%; font-size:16px; color:white;}
+.web { background:#1e293b;}
+.french { background:#4c1d95;}
+.counsel { background:#059669;}
+#form-container { display:none; flex-direction:column;}
+input, textarea { width:100%; padding:10px; margin:5px 0; border-radius:5px; border:1px solid #ccc; }
+button.send, button.wa { margin-top:5px; background:#111; color:white; border:none; border-radius:5px; padding:10px; cursor:pointer;}
+button.wa { background:#25D366; }
+</style>
+</head>
+<body>
+<div class="chat-container">
+<h2>TriBridge Studios & Services</h2>
+<div class="toggle-btn" onclick="toggleDark()">Toggle Dark/Light Mode</div>
+<div id="chat">
+<div class="bot message">Hello 👋 Thank you for reaching out. Please select a service:</div>
+<button class="service web" onclick="selectService('Web Design & Development')">1️⃣ Web Design & Development 💻</button>
+<button class="service french" onclick="selectService('French Translation')">2️⃣ French Translation 🇫🇷</button>
+<button class="service counsel" onclick="selectService('Counselling & Support')">3️⃣ Counselling & Support 🧠</button>
+</div>
+
+<div id="form-container">
+<input type="text" id="name" placeholder="Your Name" required>
+<input type="email" id="email" placeholder="Your Email" required>
+<textarea id="details" placeholder="Provide details here..." required></textarea>
+<button class="send" onclick="sendEmail()">Send via Email</button>
+<button class="wa" onclick="sendWhatsApp()">Send via WhatsApp</button>
+</div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/emailjs-com@3/dist/email.min.js"></script>
+<script>
+emailjs.init("j4feq3WBcwE3RIxDA"); // replace with your EmailJS public key
+
+let selectedService = "";
+
+function toggleDark(){ document.body.classList.toggle("dark"); }
+
+function appendMessage(msg, type){
+  const chat = document.getElementById("chat");
+  const div = document.createElement("div");
+  div.className = type + " message";
+  div.innerText = msg;
+  chat.appendChild(div);
+  chat.scrollTop = chat.scrollHeight;
+}
+
+function botTyping(msg, delay=1000){
+  appendMessage("Typing...", "bot");
+  setTimeout(() => {
+    document.querySelector("#chat .bot.message:last-child").innerText = msg;
+  }, delay);
+}
+
+function selectService(service){
+  selectedService = service;
+  botTyping(`You selected ${service}. Please fill in your details below so we can contact you.`, 1000);
+  document.getElementById("form-container").style.display = "flex";
+}
+
+// EmailJS Submission
+function sendEmail(){
+  const name = document.getElementById("name").value;
+  const email = document.getElementById("email").value;
+  const details = document.getElementById("details").value;
+  if(!name || !email || !details){ alert("Fill all fields"); return; }
+  const message = `Service: ${selectedService}\nName: ${name}\nEmail: ${email}\nDetails: ${details}`;
+  emailjs.send('service_9t9a03s','template_ex208ck',{message: message})
+    .then(() => { appendMessage("Your message has been sent via Email! ✅", "bot"); })
+    .catch(err => { console.error(err); appendMessage("Error sending Email ❌", "bot"); });
+}
+
+// WhatsApp DM
+function sendWhatsApp(){
+  const name = document.getElementById("name").value;
+  const email = document.getElementById("email").value;
+  const details = document.getElementById("details").value;
+  if(!name || !email || !details){ alert("Fill all fields"); return; }
+  const text = `Service: ${selectedService}\nName: ${name}\nEmail: ${email}\nDetails: ${details}`;
+  const url = `https://wa.me/254785117163?text=${encodeURIComponent(text)}`;
+  window.open(url,'_blank');
+}
+</script>
+</body>
+</html>
